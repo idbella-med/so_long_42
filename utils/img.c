@@ -1,38 +1,70 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   img.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mohidbel <mohidbel@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/12 18:01:51 by mohidbel          #+#    #+#             */
+/*   Updated: 2025/03/13 22:08:53 by mohidbel         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../so_long.h"
 
-void load_images(t_game *a)
+static void	load(void *mlx, t_img *img, char *path)
 {
-    a->wall.img = mlx_xpm_file_to_image(a->mlx, "images/wall.xpm", &a->wall.width, &a->wall.height);
-    a->floor.img = mlx_xpm_file_to_image(a->mlx, "images/floor.xpm", &a->floor.width, &a->floor.height);
-    a->player_img.img = mlx_xpm_file_to_image(a->mlx, "images/player.xpm", &a->player_img.width, &a->player_img.height);
-    a->collectible.img = mlx_xpm_file_to_image(a->mlx, "images/collectible.xpm", &a->collectible.width, &a->collectible.height);
-    a->exit.img = mlx_xpm_file_to_image(a->mlx, "images/exit.xpm", &a->exit.width, &a->exit.height);
-    if (!a->wall.img || !a->floor.img || !a->player_img.img || !a->collectible.img || !a->exit.img)
-        error_exit("Failed to load images");
+	img->img = mlx_xpm_file_to_image(mlx, path, &img->width, &img->height);
 }
 
-void render_map(t_game *a)
+static int	validate_images(t_game *a)
 {
-    int i = 0;
-    int j;
+	return (a->wall.img && a->floor.img && a->player_img.img
+		&& a->collectible.img && a->exit.img);
+}
 
-    while (i < a->y)
-    {
-        j = 0;
-        while (j < a->x)
-        {
-            if (a->map[i][j] == '1')
-                mlx_put_image_to_window(a->mlx, a->windows, a->wall.img, j * size, i * size);
-            else if (a->map[i][j] == '0')
-                mlx_put_image_to_window(a->mlx, a->windows, a->floor.img, j * size, i * size);
-            else if (a->map[i][j] == 'P')
-                mlx_put_image_to_window(a->mlx, a->windows, a->player_img.img, j * size, i * size);
-            else if (a->map[i][j] == 'C')
-                mlx_put_image_to_window(a->mlx, a->windows, a->collectible.img, j * size, i * size);
-            else if (a->map[i][j] == 'E')
-                mlx_put_image_to_window(a->mlx, a->windows, a->exit.img, j * size, i * size);
-            j++;
-        }
-        i++;
-    }
+void	load_images(t_game *a)
+{
+	load(a->mlx, &a->wall, "images/wall.xpm");
+	load(a->mlx, &a->floor, "images/floor.xpm");
+	load(a->mlx, &a->player_img, "images/player.xpm");
+	load(a->mlx, &a->collectible, "images/collectible.xpm");
+	load(a->mlx, &a->exit, "images/exit.xpm");
+	if (!validate_images(a))
+		error_exit("Failed to load images");
+}
+
+static t_img	*get_tile_image(t_game *a, char tile)
+{
+	if (tile == '1')
+		return (&a->wall);
+	if (tile == '0')
+		return (&a->floor);
+	if (tile == 'P')
+		return (&a->player_img);
+	if (tile == 'C')
+		return (&a->collectible);
+	if (tile == 'E')
+		return (&a->exit);
+	return (NULL);
+}
+
+void	render_map(t_game *a)
+{
+	int		i;
+	int		j;
+	t_img	*img;
+
+	i = -1;
+	while (++i < a->y)
+	{
+		j = -1;
+		while (++j < a->x)
+		{
+			img = get_tile_image(a, a->map[i][j]);
+			if (img)
+				mlx_put_image_to_window(a->mlx, a->windows,
+					img->img, j * SIZE, i * SIZE);
+		}
+	}
 }

@@ -1,9 +1,12 @@
 NAME = so_long
-# CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror
 MLXFLAG = -lmlx -framework OpenGL -framework AppKit
 COMP = cc
-HEADRES = so_long.h Libft/libft.h
-SRCS = so_long.c utils/utils.c utils/img.c utils/map.c utils/parcing_map.c gnl/get_next_line.c gnl/get_next_line_utils.c 
+
+HEADRES = so_long.h Libft/libft.h gnl/get_next_line.h
+
+SRCS = so_long.c utils/utils.c utils/img.c utils/map.c utils/initialize.c utils/parcing_map.c \
+		utils/player.c utils/path.c gnl/get_next_line.c gnl/get_next_line_utils.c 
 
 OBGS = $(SRCS:.c=.o)
 
